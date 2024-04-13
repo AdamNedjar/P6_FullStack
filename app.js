@@ -10,7 +10,7 @@ const sauceRoutes = require('./routes/sauces'); // Routes pour les opérations C
 const app = express();
 
 // Connexion à la base de données MongoDB
-mongoose.connect('mongodb+srv://Liebert75:Lallana20@liebert.n9qhsy7.mongodb.net/P6Piiquante?retryWrites=true&w=majority&appName=Liebert',)
+mongoose.connect
 .then(() => console.log('Connexion à MongoDB réussie !'))
 .catch(() => console.log('Connexion à MongoDB échouée !'));
 
