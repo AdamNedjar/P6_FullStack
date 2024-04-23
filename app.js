@@ -1,6 +1,19 @@
 const express = require('express'); // Framework web pour Node.js
 const mongoose = require('mongoose'); // Bibliothèque de modélisation d'objets pour MongoDB
 const path = require('path'); // Module intégré de Node.js pour la gestion des chemins de fichiers et des répertoires
+require('dotenv').config();
+
+
+const dbUser = process.env.DB_USER;
+const dbPassword = process.env.DB_PASSWORD;
+const dbHost = process.env.DB_HOST;
+const secretToken = process.env.SECRET_TOKEN;
+
+console.log(`Utilisateur de la base de données : ${dbUser}`);
+console.log(`Mot de passe de la base de données : ${dbPassword}`);
+console.log(`Hôte de la base de données : ${dbHost}`);
+console.log(`Jeton secret : ${secretToken}`);
+
 
 
 const userRoutes = require('./routes/users'); // Routes pour l'authentification des utilisateurs
@@ -10,7 +23,7 @@ const sauceRoutes = require('./routes/sauces'); // Routes pour les opérations C
 const app = express();
 
 // Connexion à la base de données MongoDB
-mongoose.connect
+mongoose.connect('mongodb+srv://Liebert75:Lallana20@liebert.n9qhsy7.mongodb.net/P6Piiquante?retryWrites=true&w=majority&appName=Liebert',)
 .then(() => console.log('Connexion à MongoDB réussie !'))
 .catch(() => console.log('Connexion à MongoDB échouée !'));
 
