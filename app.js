@@ -1,5 +1,6 @@
 const express = require('express'); // Framework web pour Node.js
 const mongoose = require('mongoose'); // Bibliothèque de modélisation d'objets pour MongoDB
+const ExpressBrute = require('express-brute');
 const path = require('path'); // Module intégré de Node.js pour la gestion des chemins de fichiers et des répertoires
 require('dotenv').config();
 
@@ -38,9 +39,17 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+const store = new ExpressBrute.MemoryStore(); // Utilisation d'un magasin de mémoire pour stocker les données de blocage (vous pouvez également utiliser d'autres types de stockage, comme Redis)
+
+const bruteforce = new ExpressBrute(store, {
+    freeRetries: 3, // Nombre de tentatives de connexion gratuites avant le blocage
+    minWait: 5000, // Délai minimum avant de réessayer après un blocage (en millisecondes)
+    maxWait: 15 * 60 * 1000, // Délai maximum avant de réessayer après un blocage (en millisecondes)
+    lifetime: 24 * 60 * 60, // Durée pendant laquelle les tentatives de connexion infructueuses sont conservées en mémoire (en secondes)
+});
 
 app.use('/images', express.static(path.join(__dirname, 'images'))); // Exposition du répertoire d'images statiques
-app.use('/api/auth', userRoutes); // Routes pour l'authentification des utilisateurs
+app.use('/api/auth', bruteforce.prevent, userRoutes); // Routes pour l'authentification des utilisateurs
 app.use('/api/sauces', sauceRoutes); // Routes pour les objets "sauce"
 
 // Exportation de l'application pour une utilisation externe
