@@ -1,13 +1,17 @@
 // Importation du module jsonwebtoken pour la gestion des tokens JWT
 const jwt = require('jsonwebtoken');
 
+const crypto = require('crypto');
+const secretToken = crypto.randomBytes(32).toString('hex');
+
+
 // Exportation du middleware
 module.exports = (req, res, next) => {
     try {
         //Récupération du token d'authentification depuis l'en-tete Authorization de la requete
         const token = req.headers.authorization.split(' ')[1];
         // Vérification du token et extraction des informations encodées (payload)  
-        const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
+        const decodedToken = jwt.verify(token, secretToken);
         // Extraction de l'ID utilisateur à partir du token décodé
         const userId = decodedToken.userId;
 
