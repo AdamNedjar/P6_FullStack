@@ -1,6 +1,8 @@
 // Importation du module express et création d'un routeur avec express.Router()
 const express = require('express');
 const router = express.Router();
+const bruteforce = require('../config/Config.js'); // Importation de la configuration de express-brute
+
 
 // Importation du contrôleur utilisateur (userCtrl)
 const userCtrl = require('../controllers/user');
@@ -11,7 +13,7 @@ const userCtrl = require('../controllers/user');
 router.post('/signup', userCtrl.signup);
 
 // Route POST '/login' pour la connexion d'un utilisateur existant
-router.post('/login', userCtrl.login);
+router.post('/login', bruteforce.prevent, userCtrl.login);
 
 // Exportation du routeur pour une utilisation dans d'autres parties de l'application
 module.exports = router;
