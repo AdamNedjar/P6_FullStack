@@ -4,25 +4,42 @@ const jwt = require('jsonwebtoken');
 
 // Importation du modèle User
 const User = require('../models/User');
-console.log('signu')
+
+// RegExp pour valider l'email
+const emailRegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// RegExp pour valider le mot de passe
+const passwordRegExp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
 // Fonction pour gérer la création d'un nouvel utilisateur
-exports.signup = (req, res, next) =>{
-  console.log("signup")
-// Hachage du mot de passe reçu dans la requête avec un coût de hachage de 10
-    bcrypt.hash(req.body.password, 10)
-      .then(hash => {
-        // Création d'un nouvel utilisateur avec l'e-mail et le mot de passe haché
-        const user = new User({
-          email: req.body.email,
-          password: hash
-        });
-        // Enregistrement de l'utilisateur dans la base de données
-        user.save()
-            .then(() => res.status(201).json({message : 'Utilisateur crée !'}))
-            .catch(error => res.status(400).json({message : error }));
-      })
-      .catch(error => res.status(500).json({ error }));
-  };
+exports.signup = (req, res, next) => {
+    const { email, password } = req.body;
+
+    // Vérification que l'email est valide et non vide
+    if (!email || !emailRegExp.test(email)) {
+        return res.status(400).json({ message: 'L\'email est invalide' });
+    }
+
+    // Vérification que le mot de passe est valide et respecte les critères spécifiés
+    if (!password || !passwordRegExp.test(password)) {
+        return res.status(400).json({ message: 'Le mot de passe doit contenir au moins 8 caractères, une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial' });
+    }
+
+    // Hachage du mot de passe reçu dans la requête avec un coût de hachage de 10
+    bcrypt.hash(password, 10)
+        .then(hash => {
+            // Création d'un nouvel utilisateur avec l'email et le mot de passe haché
+            const user = new User({
+                email: email,
+                password: hash
+            });
+            // Enregistrement de l'utilisateur dans la base de données
+            user.save()
+                .then(() => res.status(201).json({ message: 'Utilisateur créé !' }))
+                .catch(error => res.status(400).json({ message: error }));
+        })
+        .catch(error => res.status(500).json({ message: error }));
+};
 
 
 // Fonction pour gérer l'authentification d'un utilisateur existant
