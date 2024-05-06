@@ -34,8 +34,9 @@ exports.getOneSauce = (req, res, next) => {
     // Recherche d'une sauce par son identifiant dans la base de données
     Sauce.findOne({ _id: req.params.id })
         .then(sauce => res.status(200).json(sauce))
-        .catch(error => res.status(404).json({ error }));
+        .catch(error => res.status(404).json({ error: 'Sauce non trouvée' }));
 };
+
 
 // Fonction pour modifier une sauce
 exports.modifySauce = (req, res, next) => {
