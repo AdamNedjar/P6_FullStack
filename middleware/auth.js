@@ -19,9 +19,8 @@ module.exports = (req, res, next) => {
             // Si l'ID de l'utilisateur est valide, passer au middleware suivant
             next();
         }
-        // Si une erreur survient lors de l'exécution du middleware
-        // Renvoyer une réponse avec un statut HTTP 401 (non autorisé) et un message d'erreur
-    } catch {
-        res.status(401).json({ error: error | 'Requete non authentifiée !'});
+       // Si le token est invalide ou expiré, renvoyez une erreur 403 (Accès refusé)
+    } catch (error) {
+        res.status(403).json({ message: 'Accès refusé ! Veuillez vous authentifier.' });
     }
 };
