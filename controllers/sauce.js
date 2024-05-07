@@ -69,18 +69,13 @@ Sauce.findOne({ _id: req.params.id })
 
 
 
-
-
-
-
-
 // Fonction pour supprimer une sauce
 exports.deleteSauce = (req, res, next) => {
     // Recherche de la sauce par son identifiant dans la base de données
-    Sauce.findOne({ _id: req.params.id, userId: req.userData.userId })
+    Sauce.findOne({ _id: req.params.id})
         .then(sauce => {
             // Vérification si l'utilisateur actuel est bien celui qui a créé la sauce
-            if (!sauce) {
+            if (sauce.userId !== req.userData.userId) {
                 return res.status(403).json({ error: 'Vous n\'êtes pas autorisé à supprimer cette sauce' });
             } 
             // Récupération du nom du fichier image de la sauce
@@ -93,7 +88,7 @@ exports.deleteSauce = (req, res, next) => {
                     .catch(error => res.status(400).json({ error }));
             });
         })
-        .catch(error => res.status(500).json({ error }));
+        .catch(error => res.status(404).json({error: 'Sauce non trouvée' }));
 };
 
 
