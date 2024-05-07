@@ -37,6 +37,8 @@ exports.getOneSauce = (req, res, next) => {
         .catch(error => res.status(404).json({ error: 'Sauce non trouvée' }));
 };
 
+
+
 // Fonction pour modifier une sauce
 exports.modifySauce = (req, res, next) => {
     // Vérification si une nouvelle image est fournie dans la requête
@@ -44,21 +46,32 @@ exports.modifySauce = (req, res, next) => {
         ...JSON.parse(req.body.sauce),
         imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     } : { ...req.body };
-
-    // Recherche de la sauce par son identifiant dans la base de données
-    Sauce.findOne({ _id: req.params.id, userId: req.userData.userId })
-        .then(sauce => {
-            // Vérification si la sauce existe et si l'utilisateur actuel est celui qui a créé la sauce
-            if (!sauce) {
-                return res.status(403).json({ error: 'Vous n\'êtes pas autorisé à modifier cette sauce' });
-            }
-            // Mise à jour de la sauce dans la base de données
-            Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
-                .then(() => res.status(200).json({ message: "Sauce modifiée avec succès !" }))
-                .catch(error => res.status(400).json({ error }));
-        })
-        .catch(error => res.status(500).json({ error }));
+// Recherche de la sauce par son identifiant dans la base de données
+Sauce.findOne({ _id: req.params.id })
+    .then(sauce => {
+        // Vérification si l'utilisateur actuel est celui qui a créé la sauce
+        if (sauce.userId !== req.userData.userId) {
+            // Si l'utilisateur actuel n'est pas celui qui a créé la sauce, renvoyer une erreur 403
+            return res.status(403).json({ error: 'Vous n\'êtes pas autorisé à modifier cette sauce' });
+        }
+        // Si la sauce existe et que l'utilisateur actuel est celui qui l'a créée, vous pouvez continuer à effectuer d'autres actions ici
+        // Par exemple, modifier la sauce
+        // Mise à jour de la sauce dans la base de données
+        Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
+        .then(() => res.status(200).json({ message: "Sauce modifiée avec succès !" }))
+        .catch(error => res.status(400).json({ error }));
+    })
+    .catch(error => {
+        // Si une erreur survient lors de la recherche dans la base de données, renvoyer une erreur 404
+        res.status(404).json({ error: 'Sauce non trouvée' });
+    });
 };
+
+
+
+
+
+
 
 
 // Fonction pour supprimer une sauce
@@ -69,7 +82,7 @@ exports.deleteSauce = (req, res, next) => {
             // Vérification si l'utilisateur actuel est bien celui qui a créé la sauce
             if (!sauce) {
                 return res.status(403).json({ error: 'Vous n\'êtes pas autorisé à supprimer cette sauce' });
-            }
+            } 
             // Récupération du nom du fichier image de la sauce
             const filename = sauce.imageUrl.split('/images/')[1];
             // Suppression du fichier image de la sauce
