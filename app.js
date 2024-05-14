@@ -41,5 +41,22 @@ app.use('/images', express.static(path.join(__dirname, 'images'))); // Expositio
 app.use('/api/auth', userRoutes); // Routes pour l'authentification des utilisateurs
 app.use('/api/sauces', sauceRoutes); // Routes pour les objets "sauce"
 
+// Middleware pour capturer les routes non définies
+app.use((req, res, next) => {
+  const error = new Error('Endpoint non trouvé');
+  error.status = 404;
+  next(error);
+});
+
+// Middleware pour gérer les autres erreurs
+app.use((error, req, res, next) => {
+  res.status(error.status || 500);
+  res.json({
+      error: {
+          message: error.message
+      }
+  });
+});
+
 // Exportation de l'application pour une utilisation externe
 module.exports = app;
